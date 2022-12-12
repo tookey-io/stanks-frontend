@@ -1,54 +1,29 @@
-import Head from "next/head";
-import { useEffect, useState } from "react";
-import { Game } from "../components/game/Game";
-import { GameState } from "../models/game";
+import { observer } from 'mobx-react-lite';
+import Head from 'next/head';
+import { useEffect, useState } from 'react';
+import { Game } from '../components/game/Game';
+import { demoScenario } from '../models/demo';
+import { GameState } from '../models/game';
+import { useStores } from '../stores';
 
-export default function Home() {
+const Home = observer(() => {
+  const { gameStore } = useStores();
 
-  const [gameState, setGameState] = useState<GameState>({
-    players: [
-      {
-        position: { x: 0, y: 0 },
-        range: 2,
-        hearts: 3,
-        points: 1,
-
-        name: "aler.btc",
-        userpic:
-          "https://images.gamma.io/ipfs/QmYCnfeseno5cLpC75rmy6LQhsNYQCJabiuwqNUXMaA3Fo/699.png",
-      },
-      {
-        position: { x: 2, y: 0 },
-        range: 3,
-        hearts: 2,
-        points: 1,
-        name: "to.btc",
-        userpic:
-          "https://images.gamma.io/ipfs/QmVEmr2uqCLQMNEb3A23hURYgSbgqzPGWE4Nd9PC8Kmq6M/2857.png",
-      },
-      {
-        position: { x: 0, y: 1 },
-        range: 3,
-        hearts: 2,
-        points: 10,
-        name: "SP279QGVTT4W3YSJJ3ZW3SQXQV1AK08VGYCVYV11D",
-        userpic:
-          "https://images.gamma.io/ipfs/QmVEmr2uqCLQMNEb3A23hURYgSbgqzPGWE4Nd9PC8Kmq6M/2857.png",
-      },
-    ],
-  });
-
+  // const [scenario, setScenario] = useState(false);
   // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     console.log("update game")
-  //     gameState.players[0].position.x = Math.floor(Math.random() * 20)
-  //     gameState.players[0].position.y = Math.floor(Math.random() * 10)
-  //     gameState.players[1].points = 1 + Math.floor(Math.random() * 5)
-  //     setGameState({...gameState})
-  //   }, 3000 + Math.random() * 1000)
+  //   if (scenario) return
+  //   setScenario(true);
 
-  //   return () => clearInterval(interval)
-  // }, [gameState])
+  //   setTimeout(() => {
+  //     if (!scenario) {
+  //       demoScenario(gameStore);
+  //     }
+  //   }, 500);
+
+  //   return () => gameStore.reset();
+  // }, [scenario]);
+
+  let state = JSON.parse(JSON.stringify(gameStore));
 
   return (
     <div>
@@ -58,11 +33,23 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="fixed inset-0">
-        <div className="absolute left-0 top-0 p-10 bg-gray">
-          <button className=""></button>
-        </div>
-        <Game {...gameState} />
+        <Game {...state} />
       </div>
+
+      <div className="absolute left-0 top-0 p-10 bg-gray">
+          <button
+            className="bg-white text-black rounded-full p-2"
+            onClick={() => {
+              console.log('test')
+              gameStore.reset();
+              demoScenario(gameStore);
+            }}
+          >
+            Demo
+          </button>
+        </div>
     </div>
   );
-}
+});
+
+export default Home;

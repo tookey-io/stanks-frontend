@@ -24,7 +24,13 @@ export type ShareAction = {
 
 export type FireAction = {
   attacker: PlayerID;
-  victom: PlayerID;
+  victim: PlayerID;
+  amount: number;
+};
+
+export type InvestAction = {
+  who: PlayerID;
+  amount: number;
 };
 
 export type HelpAction = {
@@ -59,6 +65,7 @@ export type SpawnAction = {
 export type Action =
   | { kind: "share"; data: ShareAction }
   | { kind: "fire"; data: FireAction }
+  | { kind: "invest"; data: InvestAction }
   | { kind: "help"; data: HelpAction }
   | { kind: "move"; data: MoveAction }
   | { kind: "die"; data: DieAction }
@@ -67,5 +74,28 @@ export type Action =
 
 export interface GameState {
   players: Record<PlayerID, PlayerData>;
-  actions: Action[];
 }
+
+/*
+
+MoveExecutor
+  init(state)
+  execute(immediately: true) : Promise<void>
+  // cleanUp() : void
+  commit() : state
+
+
+Game State A:
+
+async move()
+  sync remove actions
+  sync add disolve actions
+  move Player to place
+  await disolve
+  resolve
+
+Game State B:
+
+move()
+
+*/
