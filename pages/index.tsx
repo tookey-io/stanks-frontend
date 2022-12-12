@@ -48,6 +48,11 @@ const Home = observer(() => {
             Demo
           </button>
         </div>
+
+        <div className="fixed top-0 bottom-0 right-0 w-5/12 p-10 bg-black">
+            <h1>sTanKS</h1>
+            <p>Compete against others for a chance to earn 0.00005 BTC! </p>
+        </div>
     </div>
   );
 });

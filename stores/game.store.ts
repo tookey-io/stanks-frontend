@@ -42,7 +42,7 @@ export default class GameStore {
   dissolvePoints: DissolvePoint[] = [];
   appearPoints: AppearPoint[] = [];
   dissolveHearts: DissolveHeart[] = [];
-  tracings: Array<{ from: Coordinates; to: Coordinates, power: number }> = [];
+  tracings: Array<{ uuid: string, from: Coordinates; to: Coordinates, power: number }> = [];
 
   get state(): GameState {
     return {
@@ -57,6 +57,7 @@ export default class GameStore {
     this.dissolvePoints = [];
     this.appearPoints = [];
     this.dissolveHearts = [];
+    this.tracings = [];
   }
 
   addLog(msg: string) {
@@ -65,6 +66,7 @@ export default class GameStore {
   
   addTracePath(from: PlayerID, to: PlayerID, power: number) {
     this.tracings.push({
+      uuid: Math.random().toFixed(32).substring(2),
       from: this.players[from].position,
       to: this.players[to].position,
       power
