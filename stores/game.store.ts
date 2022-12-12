@@ -42,7 +42,7 @@ export default class GameStore {
   dissolvePoints: DissolvePoint[] = [];
   appearPoints: AppearPoint[] = [];
   dissolveHearts: DissolveHeart[] = [];
-  tracings: Array<{ from: Coordinates; to: Coordinates }> = [];
+  tracings: Array<{ from: Coordinates; to: Coordinates, power: number }> = [];
 
   get state(): GameState {
     return {
@@ -63,10 +63,11 @@ export default class GameStore {
     this.log.push(msg);
   }
   
-  addTracePath(from: PlayerID, to: PlayerID) {
+  addTracePath(from: PlayerID, to: PlayerID, power: number) {
     this.tracings.push({
       from: this.players[from].position,
       to: this.players[to].position,
+      power
     });
   }
 
@@ -210,7 +211,7 @@ export class FireExecutor extends BaseExecutor<FireAction> {
     while (shootsLeft--) {
       this.state.addDissolvePoint(this.attacker.position, this.attacker.points);
       this.state.setPlayerPoints(this.attacker.name, this.attacker.points - 1);
-      this.state.addTracePath(this.attacker.name, this.victim.name);
+      this.state.addTracePath(this.attacker.name, this.victim.name, 2.5);
       await sleep(300);
       this.state.setPlayerHearts(this.victim.name, this.victim.hearts);
     }

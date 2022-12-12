@@ -89,6 +89,14 @@ const JIM = 'jim.btc';
 const GRIF = 'griffden.btc';
 const XEN = 'xenitron.btc';
 
+const pank = (n: number) => `https://images.gamma.io/ipfs/Qmb84UcaMr1MUwNbYBnXWHM3kEaDcYrKuPWwyRLVTNKELC/${n}.png`
+const ape = (n: number) => `https://images.gamma.io/ipfs/QmRLFLDWeFsz6e8MVQXB21PX9NByD8mxYnQeCRKmF2LyqX/${n}.png`
+// const monster = (n: number) => `https://satoshibles.com/monsters/token/${n}/image.png`
+const monster = (n: number) => ape(n)
+// const satoshi = (n: number) => `https://satoshibles.com/token/btc/${n}/image.png`
+const satoshi = (n: number) => pank(n)
+const monkey = (n: number) => `https://images.gamma.io/ipfs/QmYCnfeseno5cLpC75rmy6LQhsNYQCJabiuwqNUXMaA3Fo/${n}.png`
+
 export async function demoScenario(game: GameStore) {
   const spawn = spawnBuilder(game);
   const share = shareBuilder(game);
@@ -101,7 +109,7 @@ export async function demoScenario(game: GameStore) {
       3,
       5,
       ALER,
-      'https://images.gamma.io/ipfs/Qmb84UcaMr1MUwNbYBnXWHM3kEaDcYrKuPWwyRLVTNKELC/3.png',
+      pank(3),
     ),
   );
   await execute(
@@ -109,7 +117,7 @@ export async function demoScenario(game: GameStore) {
       17,
       8,
       TREVOR,
-      'https://pbs.twimg.com/profile_images/1597390052769898498/Tlbe7dYH_400x400.jpg',
+      pank(552),
     ),
   );
   await execute(
@@ -117,7 +125,7 @@ export async function demoScenario(game: GameStore) {
       15,
       7,
       ALGO,
-      'https://pbs.twimg.com/profile_images/1597674224965095425/2KT1YluC_400x400.jpg',
+      ape(9541),
     ),
   );
   await execute(
@@ -125,7 +133,7 @@ export async function demoScenario(game: GameStore) {
       10,
       5,
       JACK,
-      'https://pbs.twimg.com/profile_images/1601214177439260672/O0SpU5B1_400x400.jpg',
+      monster(5555),
     ),
   );
   await execute(
@@ -133,7 +141,7 @@ export async function demoScenario(game: GameStore) {
       11,
       6,
       MONKEY,
-      'https://pbs.twimg.com/profile_images/1601983986447835136/ihZ0rkKX_400x400.jpg',
+      ape(2311)
     ),
   );
   await execute(
@@ -141,7 +149,7 @@ export async function demoScenario(game: GameStore) {
       4,
       9,
       ELSA,
-      'https://pbs.twimg.com/profile_images/1507878647457148932/nJeLYed4_400x400.jpg',
+      monkey(133),
     ),
   );
   await execute(
@@ -149,7 +157,7 @@ export async function demoScenario(game: GameStore) {
       6,
       4,
       LIGHT,
-      'https://pbs.twimg.com/profile_images/1597142063790768129/tfL4fQ06_400x400.jpg',
+      ape(321)
     ),
   );
   await execute(
@@ -157,7 +165,7 @@ export async function demoScenario(game: GameStore) {
       8,
       9,
       XAN,
-      'https://pbs.twimg.com/profile_images/1597475899569762304/xBfymBba_400x400.jpg',
+      satoshi(512),
     ),
   );
   await execute(
@@ -165,7 +173,7 @@ export async function demoScenario(game: GameStore) {
       16,
       2,
       UNKNOWN,
-      'https://pbs.twimg.com/profile_images/1581319569892790273/N7FVubf6_400x400.jpg',
+      satoshi(231),
     ),
   );
   await execute(
@@ -173,7 +181,7 @@ export async function demoScenario(game: GameStore) {
       5,
       1,
       JOHND,
-      'https://pbs.twimg.com/profile_images/1601381434425589760/JMUNuPdH_400x400.jpg',
+      ape(121)
     ),
   );
   await execute(
@@ -181,7 +189,7 @@ export async function demoScenario(game: GameStore) {
       11,
       2,
       DOC,
-      'https://pbs.twimg.com/profile_images/1597382056308350977/1NPexynZ_400x400.png',
+      ape(111)
     ),
   );
   await execute(
@@ -189,7 +197,7 @@ export async function demoScenario(game: GameStore) {
       14,
       5,
       ART,
-      'https://pbs.twimg.com/profile_images/1580307272793837574/21UvLTfF_400x400.jpg',
+      monster(566),
     ),
   );
   await execute(
@@ -197,7 +205,7 @@ export async function demoScenario(game: GameStore) {
       0,
       1,
       HERO,
-      'https://pbs.twimg.com/profile_images/1600659076177973248/V00KOFiW_400x400.jpg',
+      ape(1)
     ),
   );
   await execute(
@@ -205,7 +213,7 @@ export async function demoScenario(game: GameStore) {
       18,
       1,
       NICKY,
-      'https://pbs.twimg.com/profile_images/1578135758531076098/sTBR-0RN_400x400.jpg',
+      pank(412)
     ),
   );
   await execute(
@@ -213,7 +221,7 @@ export async function demoScenario(game: GameStore) {
       2,
       9,
       JIM,
-      'https://pbs.twimg.com/profile_images/1593210347825119237/L_SNThWQ_400x400.png',
+      pank(512)
     ),
   );
   await execute(
@@ -221,7 +229,7 @@ export async function demoScenario(game: GameStore) {
       1,
       3,
       GRIF,
-      'https://pbs.twimg.com/profile_images/1592308900711350275/VAIjn_ch_400x400.jpg',
+      pank(666)
     ),
   );
   await execute(
@@ -229,7 +237,7 @@ export async function demoScenario(game: GameStore) {
       3,
       3,
       XEN,
-      'https://pbs.twimg.com/profile_images/1478094982259134464/oUs2hCmc_400x400.jpg',
+      ape(5)
     ),
   );
 
