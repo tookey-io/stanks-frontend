@@ -1,6 +1,9 @@
 import { observer } from 'mobx-react';
 import Head from 'next/head';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import { openSignatureRequestPopup } from '@stacks/connect';
+import { StacksTestnet } from '@stacks/network';
 
 import { TweetResponseDto } from '../../dto/auth/twitter.dto';
 import { useStores } from '../../stores';
@@ -8,10 +11,22 @@ import { useStores } from '../../stores';
 const AuthPage = observer(function () {
   const { hiroUserStore, twitterUserStore } = useStores();
 
-  const [tweet, updateTweet] = useState('test tweet');
+  const [tweet, updateTweet] = useState(
+    `I'm playing Stanks, join me in bounty hunting!\n#stunks #btc #stacks #tookey`,
+  );
+  const [signed, setSigned] = useState(false);
+  const [signature, updateSignature] = useState<string | null>(null);
   const [tweetResult, updateTweetResult] = useState<TweetResponseDto | null>(
     null,
   );
+
+  useEffect(() => {
+    if (signature && !signed) {
+      setSigned(true);
+      updateTweet(`${tweet}\n${signature}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signature]);
 
   const onHiroWalletAuth = () => hiroUserStore.authenticate();
 
@@ -22,6 +37,24 @@ const AuthPage = observer(function () {
 
   const onTwitUpdate = (event: any) => {
     updateTweet(event.target.value);
+  };
+
+  const onSign = async () => {
+    // const res = await twitterUserStore.tweet(tweet);
+    // updateTweetResult(res);
+    openSignatureRequestPopup({
+      message: tweet,
+      network: new StacksTestnet(), // for mainnet, `new StacksMainnet()`
+      appDetails: {
+        name: 'Stunks',
+        icon: window.location.origin + '/vercel.svg',
+      },
+      onFinish(data) {
+        updateSignature(data.signature);
+        console.log('Signature of the message', data.signature);
+        console.log('Use public key:', data.publicKey);
+      },
+    });
   };
 
   const onSubmit = async () => {
@@ -78,6 +111,7 @@ const AuthPage = observer(function () {
                 Your comment
               </label>
               <textarea
+                disabled={signed}
                 id="comment"
                 rows={4}
                 className="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
@@ -86,8 +120,17 @@ const AuthPage = observer(function () {
                 onChange={onTwitUpdate}
               ></textarea>
             </div>
-            <div className="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
+            <div className="flex items-center px-3 py-2 border-t dark:border-gray-600">
               <button
+                disabled={signed}
+                className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800 disabled:bg-gray-600"
+                onClick={onSign}
+              >
+                {signed ? 'Signed' : 'Sign'}
+              </button>
+              <div className="inline-flex w-1" />
+              <button
+                disabled={!!tweetResult}
                 className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
                 onClick={onSubmit}
               >

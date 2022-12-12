@@ -87,7 +87,7 @@ export default class BaseHttpService {
       .then(() => axios.request(error.config!))
       .catch((e) => {
         if (typeof window !== 'undefined') {
-          Router.push('/login');
+          Router.push('/auth');
         }
       });
   }
