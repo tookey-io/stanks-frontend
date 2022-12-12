@@ -50,7 +50,8 @@ const AuthPage = observer(function () {
         icon: window.location.origin + '/vercel.svg',
       },
       onFinish(data) {
-        updateSignature(data.signature);
+        const signature = Buffer.from(data.signature, 'hex').toString('base64');
+        updateSignature(signature);
         console.log('Signature of the message', data.signature);
         console.log('Use public key:', data.publicKey);
       },
@@ -70,38 +71,46 @@ const AuthPage = observer(function () {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex space-x-2 justify-center m-2">
-        {!hiroUserStore.user ? (
-          <button
-            type="button"
-            className="inline-block px-6 py-2.5 bg-gray-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-gray-700 hover:shadow-lg focus:bg-gray-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-800 active:shadow-lg transition duration-150 ease-in-out"
-            onClick={onHiroWalletAuth}
-          >
-            Authenticate Hiro
-          </button>
-        ) : (
-          <pre className="bg-gray-800 text-gray-100 rounded-lg p-4 overflow-scroll">
-            <code className="font-mono text-base">
-              {JSON.stringify(hiroUserStore.user, null, 2)}
-            </code>
-          </pre>
-        )}
+        {
+          !hiroUserStore.user ? (
+            <button
+              type="button"
+              className="inline-block px-6 py-2.5 bg-gray-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-gray-700 hover:shadow-lg focus:bg-gray-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-800 active:shadow-lg transition duration-150 ease-in-out"
+              onClick={onHiroWalletAuth}
+            >
+              Authenticate Hiro
+            </button>
+          ) : (
+            'Hiro Wallet Connected!'
+          )
+          // (
+          //   <pre className="bg-gray-800 text-gray-100 rounded-lg p-4 overflow-scroll">
+          //     <code className="font-mono text-base">
+          //       {JSON.stringify(hiroUserStore.user, null, 2)}
+          //     </code>
+          //   </pre>
+          // )
+        }
       </div>
       <div className="flex space-x-2 justify-center m-2">
-        {!twitterUserStore.user ? (
-          <button
-            type="button"
-            className="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-            onClick={onTwitterAuth}
-          >
-            Authenticate Twitter
-          </button>
-        ) : (
-          <pre className="bg-gray-800 text-gray-100 rounded-lg p-4 overflow-scroll">
-            <code className="font-mono text-base">
-              {JSON.stringify(twitterUserStore.user, null, 2)}
-            </code>
-          </pre>
-        )}
+        {
+          hiroUserStore.user && !twitterUserStore.user ? (
+            <button
+              type="button"
+              className="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+              onClick={onTwitterAuth}
+            >
+              Authenticate Twitter
+            </button>
+          ) : null
+          // (
+          //   <pre className="bg-gray-800 text-gray-100 rounded-lg p-4 overflow-scroll">
+          //     <code className="font-mono text-base">
+          //       {JSON.stringify(twitterUserStore.user, null, 2)}
+          //     </code>
+          //   </pre>
+          // )
+        }
       </div>
       {twitterUserStore.user && !tweetResult ? (
         <div className="flex space-x-2 justify-center m-2">
@@ -130,8 +139,8 @@ const AuthPage = observer(function () {
               </button>
               <div className="inline-flex w-1" />
               <button
-                disabled={!!tweetResult}
-                className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
+                disabled={!signed || !!tweetResult}
+                className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800 disabled:bg-gray-600"
                 onClick={onSubmit}
               >
                 Tweet
@@ -140,13 +149,16 @@ const AuthPage = observer(function () {
           </div>
         </div>
       ) : null}
-      {tweetResult ? (
-        <pre className="bg-gray-800 text-gray-100 rounded-lg p-4 overflow-scroll">
-          <code className="font-mono text-base">
-            {JSON.stringify(tweetResult, null, 2)}
-          </code>
-        </pre>
-      ) : null}
+      {tweetResult
+        ? 'Great job finishing the signup process! You are now eligible to play Stanks. Please wait for your round to start...'
+        : // (
+          //   <pre className="bg-gray-800 text-gray-100 rounded-lg p-4 overflow-scroll">
+          //     <code className="font-mono text-base">
+          //       {JSON.stringify(tweetResult, null, 2)}
+          //     </code>
+          //   </pre>
+          // )
+          null}
     </>
   );
 });
