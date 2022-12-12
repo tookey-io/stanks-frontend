@@ -6,7 +6,7 @@ ENV NODE_ENV production
 # Prepare system dependencies
 ##
 
-RUN apk add --no-cache bash ca-certificates git && \
+RUN apk add --no-cache bash ca-certificates git curl && \
     adduser -h /home/app -u 101 -D app
 
 ##
