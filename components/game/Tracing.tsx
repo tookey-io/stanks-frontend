@@ -1,9 +1,9 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { Vector3Tuple } from 'three';
+
 import { config, useSpring } from '@react-spring/three';
 import { Line } from '@react-three/drei';
 import { GroupProps, useFrame } from '@react-three/fiber';
-import React from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import { Vector3Tuple } from 'three';
 
 export const Tracing: React.FC<
   {
@@ -13,7 +13,7 @@ export const Tracing: React.FC<
     onComplete?: () => void;
   } & GroupProps
 > = React.memo(
-  (props) => {
+  function Tracing(props) {
     const points = useMemo(() => [props.from, props.to], [props]);
     const [targetWidth, setTargetWidth] = useState(0);
     const [width, setWidth] = useState(0);
