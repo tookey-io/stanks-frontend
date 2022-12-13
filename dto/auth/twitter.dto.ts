@@ -7,6 +7,7 @@ export interface TwitterUserDto {
   twitterId: string;
   name?: string;
   username?: string;
+  tweet?: TweetResponseDto;
 }
 
 export interface TweetResponseDto {

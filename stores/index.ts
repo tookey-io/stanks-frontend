@@ -1,21 +1,21 @@
 import { createContext, useContext } from 'react';
 
 import ApiService from '../services/api.service';
-import AuthStore from './auth.store';
-import HiroUserStore from './hiro-user.store';
-import TwitterUserStore from './twitter-user.store';
+import HiroStore from './hiro.store';
+import TwitterStore from './twitter.store';
+import UserStore from './user.store';
 
 export class RootStore {
-  authStore: AuthStore;
-  hiroUserStore: HiroUserStore;
-  twitterUserStore: TwitterUserStore;
+  userStore: UserStore;
+  hiroStore: HiroStore;
+  twitterStore: TwitterStore;
 
   constructor() {
     const apiService = new ApiService();
 
-    this.authStore = new AuthStore(apiService);
-    this.hiroUserStore = new HiroUserStore();
-    this.twitterUserStore = new TwitterUserStore(this, apiService);
+    this.userStore = new UserStore(apiService);
+    this.hiroStore = new HiroStore();
+    this.twitterStore = new TwitterStore(apiService);
   }
 }
 

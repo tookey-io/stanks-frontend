@@ -2,10 +2,12 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import Router from 'next/router';
 
 import { APIErrorResponse } from '../dto/api/api-error-response.dto';
+import { AuthTokensResponseDto } from '../dto/auth/tokens.dto';
 
 export default class BaseHttpService {
   BASE_URL = 'http://localhost';
   _accessToken: string | null = null;
+  _refreshToken: string | null = null;
 
   async get<T = any>(
     endpoint: string,
@@ -67,12 +69,7 @@ export default class BaseHttpService {
 
       const requestUrl = error.response?.config.url;
 
-      if (
-        statusCode !== 401 ||
-        requestUrl?.endsWith('/api/auth/login') ||
-        requestUrl?.endsWith('/api/auth/register') ||
-        requestUrl?.endsWith('/api/auth/refresh')
-      ) {
+      if (statusCode !== 401 || requestUrl?.endsWith('/api/auth/refresh')) {
         throw error.response.data;
       } else {
         return this._handle401(error);
@@ -83,7 +80,7 @@ export default class BaseHttpService {
   }
 
   _handle401(error: AxiosError<APIErrorResponse>) {
-    this.get('/api/auth/refresh')
+    this.post('/api/auth/refresh', null, this._getRefreshOptions())
       .then(() => axios.request(error.config!))
       .catch((e) => {
         if (typeof window !== 'undefined') {
@@ -93,12 +90,22 @@ export default class BaseHttpService {
   }
 
   _getCommonOptions() {
-    const token = this.loadToken();
-
-    if (token) {
+    if (this.accessToken) {
       return {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+      };
+    }
+
+    return {};
+  }
+
+  _getRefreshOptions() {
+    if (this.accessToken) {
+      return {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
         },
       };
     }
@@ -107,21 +114,34 @@ export default class BaseHttpService {
   }
 
   get accessToken() {
-    return this._accessToken ? this._accessToken : this.loadToken();
+    return this._accessToken ? this._accessToken : this.loadAccessToken();
   }
 
-  saveToken(accessToken: string) {
+  get refreshToken() {
+    return this._refreshToken ? this._refreshToken : this.loadRefreshToken();
+  }
+
+  saveTokens(tokens: AuthTokensResponseDto) {
+    this._accessToken = tokens.access.token;
+    this._refreshToken = tokens.refresh.token;
+    localStorage.setItem('accessToken', this._accessToken);
+    localStorage.setItem('refreshToken', this._refreshToken);
+  }
+
+  loadAccessToken() {
+    const accessToken = localStorage.getItem('accessToken') as string;
     this._accessToken = accessToken;
-    return localStorage.setItem('accessToken', accessToken);
+    return accessToken;
   }
 
-  loadToken() {
-    const token: string = localStorage.getItem('accessToken') as string;
-    this._accessToken = token;
-    return token;
+  loadRefreshToken() {
+    const accessToken = localStorage.getItem('accessToken') as string;
+    this._accessToken = accessToken;
+    return accessToken;
   }
 
-  removeToken() {
+  removeTokens() {
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
   }
 }
