@@ -14,7 +14,6 @@ export class RootStore {
 
   constructor() {
     const apiService = new ApiService();
-
     this.userStore = new UserStore(apiService);
     this.hiroStore = new HiroStore();
     this.twitterStore = new TwitterStore(apiService);
