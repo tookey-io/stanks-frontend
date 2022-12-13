@@ -21,12 +21,12 @@ const AuthTwitterPage = observer(function () {
           userStore.saveTokens(tokens);
           const user = await twitterStore.loadUser();
           twitterStore.setUser(user);
-          router.push('/auth');
+          router.push('/');
         } else {
-          router.push('/auth');
+          router.push('/');
         }
       } else if (router.query.error) {
-        router.push('/auth');
+        router.push('/');
       }
     }
 
