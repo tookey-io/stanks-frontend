@@ -12,7 +12,7 @@ import { PlayerData } from '../../models/game';
 import { Point } from './player/Point';
 import { useSpring, animated, config } from '@react-spring/three';
 
-const Info: React.FC<Omit<PlayerData, "position"> & HtmlProps> = (props) => {
+const Userpic: React.FC<Omit<PlayerData, "position"> & HtmlProps> = (props) => {
   const userPic = useTexture({
     map: props.userpic
   })
@@ -24,22 +24,39 @@ const Info: React.FC<Omit<PlayerData, "position"> & HtmlProps> = (props) => {
         <meshLambertMaterial {...userPic} /> 
       </mesh>
     </group>
-    // <Html {...props} style={{ position: 'relative' }}>
-    //   <div className="flex justify-center rounded-full bg-white w-0 mb-1">
-    //     {new Array(props.hearts).fill(0).map((_, index) => (
-    //       <div
-    //         key={index}
-    //         className="rounded-full w-1 h-1 bg-red m-[1px] flex-none"
-    //       ></div>
-    //     ))}
-    //   </div>
-    //   <div className="group flex items-center bg-white rounded-full relative left-[-1rem]">
-    //     <img src={props.userpic} className="w-8 h-8 rounded-full" />
-    //     <div className="transition-all mx-0 max-w-0 text-black group-hover:mx-2 group-hover:max-w-[100px] truncate">
-    //       {props.name}
-    //     </div>
-    //   </div>
-    // </Html>
+  );
+};
+
+const Hearts: React.FC<Omit<PlayerData, "position"> & HtmlProps> = (props) => {
+  return (
+    <group {...props}>
+      <Html transform prepend style={{ position: 'relative' }}>
+        <div className="flex justify-center rounded-full bg-white gap-[1px] p-[1px] mt-2">
+          {new Array(props.hearts).fill(0).map((_, index) => (
+            <div
+              key={index}
+              className="rounded-full w-1 h-1 bg-red flex-none"
+            ></div>
+          ))}
+        </div>
+      </Html>
+    </group>
+  );
+};
+const Range: React.FC<Omit<PlayerData, "position"> & HtmlProps> = (props) => {
+  return (
+    <group {...props}>
+      <Html transform prepend style={{ position: 'relative' }}>
+        <div className="flex justify-center bg-black gap-[2px] p-[1px] mb-2">
+          {new Array(props.range).fill(0).map((_, index) => (
+            <div
+              key={index}
+              className="w-1 h-1 bg-white flex-none"
+            ></div>
+          ))}
+        </div>
+      </Html>
+    </group>
   );
 };
 
@@ -56,7 +73,9 @@ export const Player: React.FC<PlayerData & Omit<GroupProps, 'position'>> = (
       position={position}
       rotation={[-Math.PI * 0.5, 0, 0]}
     >
-      <Info {...props} position={[0, 0, props.points * 0.15]} scale={0.8}/>
+      <Userpic {...props} position={[0, 0, props.points * 0.15]} scale={0.8}/>
+      <Hearts {...props} position={[0, 0.5, props.points * 0.15]} />
+      <Range {...props} position={[0, -0.5, props.points * 0.15]} />
       {props.points > 0 &&
         new Array(props.points)
           .fill(0)

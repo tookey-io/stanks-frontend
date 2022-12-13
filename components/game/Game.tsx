@@ -28,7 +28,7 @@ const Log: React.FC<{ lines: string[] }> = ({ lines }) => {
         height: '0px',
       }}
     >
-      <ul className="">
+      <ul className="pointer-events-none">
         {lines.map((line, index) => (
           <li key={index}>{line}</li>
         ))}
@@ -53,7 +53,7 @@ export const Game: React.FC<GameStore> = (props) => {
         position: [300, 450, 300],
         near: -1000,
         far: 1000,
-        zoom: 1.5 * 100,
+        zoom: 50,
       }}
     >
       <Suspense>
@@ -71,15 +71,17 @@ export const Game: React.FC<GameStore> = (props) => {
 
           <Logotype position={[-0.5, 0, 9.5]} />
 
-          <Tracing from={[0, 0.15, 1]} to={[5, 0.15, 1]} power={3} />
-
           {props.tracings.map((trace, index) => (
             <Tracing
-              key={index}
+              key={trace.uuid}
               from={[trace.from.x, 0.15, trace.from.y]}
               to={[trace.to.x, 0.15, trace.to.y]}
               power={trace.power}
-              onComplete={() => props.tracings.splice(index)}
+              onComplete={() =>
+                props.tracings.splice(
+                  props.tracings.findIndex((t) => t.uuid === trace.uuid),
+                )
+              }
             />
           ))}
 
@@ -108,7 +110,7 @@ export const Game: React.FC<GameStore> = (props) => {
             distanceFactor={15}
             rotation={[Math.PI * -0.5, 0, 0]}
             position={[-0.5, 0, 10.38]}
-            className="flex flex-col justify-start"
+            className="flex flex-col justify-start pointer-events-none"
             style={{
               fontFamily: 'monospace',
               color: '#333333',
@@ -126,8 +128,8 @@ export const Game: React.FC<GameStore> = (props) => {
             />
           </Html>
         </group>
-        {/* <MapControls /> */}
-        <OrbitControls />
+        <MapControls />
+        {/* <OrbitControls /> */}
       </Suspense>
     </Canvas>
   );
