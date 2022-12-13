@@ -16,13 +16,13 @@ RUN apk add --no-cache bash ca-certificates git curl && \
 USER root
 WORKDIR /app
 
-COPY package.json yarn.lock /app/
-RUN NODE_ENV=development yarn install --frozen-lockfile && \
-    yarn cache clean && \
+COPY package.json package-lock.json /app/
+RUN NODE_ENV=development npm install --frozen-lockfile && \
+    rm -rf /root/.npm && \
     chown 101:101 -R /app
 
 COPY --chown=101:101 . /app/
-RUN yarn run build && \
+RUN npm run build && \
     chown 101:101 -R /app && \
     chmod +x /app/bin/*.sh
 
