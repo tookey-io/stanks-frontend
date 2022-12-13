@@ -28,7 +28,7 @@ const Log: React.FC<{ lines: string[] }> = ({ lines }) => {
         height: '0px',
       }}
     >
-      <ul className="">
+      <ul className="pointer-events-none">
         {lines.map((line, index) => (
           <li key={index}>{line}</li>
         ))}
@@ -110,7 +110,7 @@ export const Game: React.FC<GameStore> = (props) => {
             distanceFactor={15}
             rotation={[Math.PI * -0.5, 0, 0]}
             position={[-0.5, 0, 10.38]}
-            className="flex flex-col justify-start"
+            className="flex flex-col justify-start pointer-events-none"
             style={{
               fontFamily: 'monospace',
               color: '#333333',

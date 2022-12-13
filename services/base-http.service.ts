@@ -4,7 +4,7 @@ import Router from 'next/router';
 import { APIErrorResponse } from '../dto/api/api-error-response.dto';
 
 export default class BaseHttpService {
-  BASE_URL = 'http://localhost';
+  BASE_URL = 'http://localhost:3001';
   _accessToken: string | null = null;
 
   async get<T = any>(
