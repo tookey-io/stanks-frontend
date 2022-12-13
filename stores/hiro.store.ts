@@ -18,7 +18,7 @@ export default class HiroStore {
     return new Promise((resolve, reject) => {
       showConnect({
         appDetails: {
-          name: 'Stanks',
+          name: process.env.NEXT_PUBLIC_APP_NANE || 'Stanks',
           icon: 'https://tookey.io/icons/icon-256x256.png',
         },
         redirectTo: '/',

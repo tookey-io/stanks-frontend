@@ -5,7 +5,6 @@ import { APIErrorResponse } from '../dto/api/api-error-response.dto';
 import { AuthTokensResponseDto } from '../dto/auth/tokens.dto';
 
 export default class BaseHttpService {
-  BASE_URL = 'http://localhost';
   _accessToken: string | null = null;
   _refreshToken: string | null = null;
 
@@ -15,7 +14,7 @@ export default class BaseHttpService {
   ): Promise<T | void> {
     Object.assign(options, this._getCommonOptions());
     return axios
-      .get<T>(`${this.BASE_URL}${endpoint}`, options)
+      .get<T>(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, options)
       .then((res: AxiosResponse<T>) => res.data)
       .catch((error: AxiosError<APIErrorResponse>) =>
         this._handleHttpError(error),
@@ -29,7 +28,11 @@ export default class BaseHttpService {
   ): Promise<T | void> {
     Object.assign(options, this._getCommonOptions());
     return axios
-      .post<T>(`${this.BASE_URL}${endpoint}`, data, options)
+      .post<T>(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`,
+        data,
+        options,
+      )
       .then((res: AxiosResponse<T>) => res.data)
       .catch((error: AxiosError<APIErrorResponse>) =>
         this._handleHttpError(error),
@@ -42,7 +45,7 @@ export default class BaseHttpService {
   ): Promise<T | void> {
     Object.assign(options, this._getCommonOptions());
     return axios
-      .delete<T>(`${this.BASE_URL}${endpoint}`, options)
+      .delete<T>(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, options)
       .then((res: AxiosResponse<T>) => res.data)
       .catch((error: AxiosError<APIErrorResponse>) =>
         this._handleHttpError(error),
@@ -56,7 +59,11 @@ export default class BaseHttpService {
   ): Promise<T | void> {
     Object.assign(options, this._getCommonOptions());
     return axios
-      .patch<T>(`${this.BASE_URL}${endpoint}`, data, options)
+      .patch<T>(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`,
+        data,
+        options,
+      )
       .then((res: AxiosResponse<T>) => res.data)
       .catch((error: AxiosError<APIErrorResponse>) =>
         this._handleHttpError(error),

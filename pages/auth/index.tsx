@@ -69,7 +69,7 @@ const AuthPage = observer(() => {
       message: tweet,
       network: new StacksMainnet(),
       appDetails: {
-        name: 'Stanks',
+        name: process.env.NEXT_PUBLIC_APP_NANE || 'Stanks',
         icon: 'https://tookey.io/icons/icon-256x256.png',
       },
       onFinish(data) {
