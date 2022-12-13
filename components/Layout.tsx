@@ -1,7 +1,9 @@
+import { observer } from 'mobx-react-lite';
+import Head from 'next/head';
+
+import { demoScenario } from '../models/demo';
 import { useStores } from '../stores';
 import { Game } from './game/Game';
-import { demoScenario } from '../models/demo';
-import { observer } from 'mobx-react-lite';
 
 const Layout: React.FC<React.PropsWithChildren<{}>> = observer(
   ({ children }) => {
@@ -11,14 +13,22 @@ const Layout: React.FC<React.PropsWithChildren<{}>> = observer(
     console.log(state);
 
     return (
-      <div>
-        <div className="fixed inset-0">
+      <>
+        <Head>
+          <title>Stanks Online</title>
+          <meta
+            name="description"
+            content="Stanks is a real-time strategy game with a diplomatic and cooperative theme"
+          />
+          <link rel="icon" href="/favicon-32x32.png" />
+        </Head>
+        <div className="h-[calc(100vh_-_18rem)] md:h-auto md:fixed md:inset-0">
           <Game {...state} />
         </div>
 
-        <div className="absolute left-0 top-0 p-10 bg-gray">
+        <div className="absolute left-0 top-0 m-10 bg-gray">
           <button
-            className="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 disabled:cursor-not-allowed disabled:opacity-50 mr-2 mb-2"
+            className="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={() => {
               console.log('test');
               gameStore.reset();
@@ -29,10 +39,10 @@ const Layout: React.FC<React.PropsWithChildren<{}>> = observer(
           </button>
         </div>
 
-        <div className="fixed top-0 bottom-0 right-0 w-5/12 p-10 bg-black overflow-auto">
+        <div className="md:fixed md:top-0 md:bottom-0 md:right-0 md:w-5/12 p-10 bg-black md:overflow-auto">
           {children}
         </div>
-      </div>
+      </>
     );
   },
 );
