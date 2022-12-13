@@ -19,7 +19,7 @@ export default class HiroStore {
       showConnect({
         appDetails: {
           name: 'Stanks',
-          icon: window.location.origin + '/vercel.svg',
+          icon: 'https://tookey.io/icons/icon-256x256.png',
         },
         redirectTo: '/',
         onFinish: () => {

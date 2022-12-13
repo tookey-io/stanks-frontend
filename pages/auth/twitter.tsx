@@ -22,7 +22,11 @@ const AuthTwitterPage = observer(function () {
           const user = await twitterStore.loadUser();
           twitterStore.setUser(user);
           router.push('/auth');
+        } else {
+          router.push('/auth');
         }
+      } else if (router.query.error) {
+        router.push('/auth');
       }
     }
 
