@@ -1,15 +1,15 @@
-import { Html, MapControls, OrbitControls, Text3D } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
 import Image from 'next/image';
 import { Suspense } from 'react';
-import { Vector3 } from 'three';
-import { GameState } from '../../models/game';
+
+import { Html, MapControls } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
+
 import GameStore from '../../stores/game.store';
 import { Logotype } from './Logo';
 import { Player } from './Player';
-import { FloatingPoint } from './player/Point';
 import { Tile } from './Tile';
 import { Tracing } from './Tracing';
+import { FloatingPoint } from './player/Point';
 
 const Log: React.FC<{ lines: string[] }> = ({ lines }) => {
   return (
