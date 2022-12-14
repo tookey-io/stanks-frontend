@@ -1,9 +1,7 @@
+import { Vector3Tuple } from 'three';
+
 import { animated, config, useSpring } from '@react-spring/three';
-import { GroupProps, useFrame } from '@react-three/fiber';
-import { Color, LayerMaterial } from 'lamina';
-import { useEffect, useRef, useState } from 'react';
-import { Group, Vector3, Vector3Tuple } from 'three';
-import { UnattachedPoint } from '../../../stores/game.store';
+import { GroupProps } from '@react-three/fiber';
 
 export const Point: React.FC<GroupProps> = (props) => {
   return (
@@ -23,12 +21,12 @@ export const Point: React.FC<GroupProps> = (props) => {
 export const FloatingPoint: React.FC<{
   from: Vector3Tuple;
   to: Vector3Tuple;
-  onComplete?: () => void
+  onComplete?: () => void;
 }> = ({ from, to, onComplete }) => {
   const { scale } = useSpring({
     from: { scale: 0.8 },
     scale: 0,
-    config: config.gentle
+    config: config.gentle,
   });
   const { position } = useSpring({
     from: {
@@ -36,10 +34,14 @@ export const FloatingPoint: React.FC<{
     },
     position: to,
     config: config.wobbly,
-    onResolve: () => onComplete ? onComplete() : {}
+    onResolve: () => (onComplete ? onComplete() : {}),
   });
   return (
-    <animated.group scale={scale} rotation={[-Math.PI * 0.5, 0, 0]} position={position}>
+    <animated.group
+      scale={scale}
+      rotation={[-Math.PI * 0.5, 0, 0]}
+      position={position}
+    >
       <Point />
     </animated.group>
   );

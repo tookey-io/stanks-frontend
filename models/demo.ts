@@ -1,12 +1,12 @@
 import GameStore, {
-    FireExecutor,
+  FireExecutor,
   IExecutor,
   InvestExecutor,
   MoveExecutor,
   ShareExecutor,
   SpawnExecutor,
 } from '../stores/game.store';
-import { Coordinates, PlayerID } from './game';
+import { PlayerID } from './game';
 
 const execute = async (executor: IExecutor) => {
   executor.begin();
@@ -61,7 +61,8 @@ const investBuilder = (game: GameStore) => (who: PlayerID, amount: number) =>
     },
     game,
   );
-  const fireBuilder = (game: GameStore) => (attacker: PlayerID, victim: PlayerID, amount: number) =>
+const fireBuilder =
+  (game: GameStore) => (attacker: PlayerID, victim: PlayerID, amount: number) =>
     new FireExecutor(
       {
         attacker,
@@ -89,13 +90,16 @@ const JIM = 'jim.btc';
 const GRIF = 'griffden.btc';
 const XEN = 'xenitron.btc';
 
-const pank = (n: number) => `https://images.gamma.io/ipfs/Qmb84UcaMr1MUwNbYBnXWHM3kEaDcYrKuPWwyRLVTNKELC/${n}.png`
-const ape = (n: number) => `https://images.gamma.io/ipfs/QmRLFLDWeFsz6e8MVQXB21PX9NByD8mxYnQeCRKmF2LyqX/${n}.png`
+const pank = (n: number) =>
+  `https://images.gamma.io/ipfs/Qmb84UcaMr1MUwNbYBnXWHM3kEaDcYrKuPWwyRLVTNKELC/${n}.png`;
+const ape = (n: number) =>
+  `https://images.gamma.io/ipfs/QmRLFLDWeFsz6e8MVQXB21PX9NByD8mxYnQeCRKmF2LyqX/${n}.png`;
 // const monster = (n: number) => `https://satoshibles.com/monsters/token/${n}/image.png`
-const monster = (n: number) => ape(n)
+const monster = (n: number) => ape(n);
 // const satoshi = (n: number) => `https://satoshibles.com/token/btc/${n}/image.png`
-const satoshi = (n: number) => pank(n)
-const monkey = (n: number) => `https://images.gamma.io/ipfs/QmYCnfeseno5cLpC75rmy6LQhsNYQCJabiuwqNUXMaA3Fo/${n}.png`
+const satoshi = (n: number) => pank(n);
+const monkey = (n: number) =>
+  `https://images.gamma.io/ipfs/QmYCnfeseno5cLpC75rmy6LQhsNYQCJabiuwqNUXMaA3Fo/${n}.png`;
 
 export async function demoScenario(game: GameStore) {
   const spawn = spawnBuilder(game);
@@ -104,142 +108,23 @@ export async function demoScenario(game: GameStore) {
   const invest = investBuilder(game);
   const fire = fireBuilder(game);
 
-  await execute(
-    spawn(
-      3,
-      5,
-      ALER,
-      pank(3),
-    ),
-  );
-  await execute(
-    spawn(
-      17,
-      8,
-      TREVOR,
-      pank(552),
-    ),
-  );
-  await execute(
-    spawn(
-      15,
-      7,
-      ALGO,
-      ape(9541),
-    ),
-  );
-  await execute(
-    spawn(
-      10,
-      5,
-      JACK,
-      monster(5555),
-    ),
-  );
-  await execute(
-    spawn(
-      11,
-      6,
-      MONKEY,
-      ape(2311)
-    ),
-  );
-  await execute(
-    spawn(
-      4,
-      9,
-      ELSA,
-      monkey(133),
-    ),
-  );
-  await execute(
-    spawn(
-      6,
-      4,
-      LIGHT,
-      ape(321)
-    ),
-  );
-  await execute(
-    spawn(
-      8,
-      9,
-      XAN,
-      satoshi(512),
-    ),
-  );
-  await execute(
-    spawn(
-      16,
-      2,
-      UNKNOWN,
-      satoshi(231),
-    ),
-  );
-  await execute(
-    spawn(
-      5,
-      1,
-      JOHND,
-      ape(121)
-    ),
-  );
-  await execute(
-    spawn(
-      11,
-      2,
-      DOC,
-      ape(111)
-    ),
-  );
-  await execute(
-    spawn(
-      14,
-      5,
-      ART,
-      monster(566),
-    ),
-  );
-  await execute(
-    spawn(
-      0,
-      1,
-      HERO,
-      ape(1)
-    ),
-  );
-  await execute(
-    spawn(
-      18,
-      1,
-      NICKY,
-      pank(412)
-    ),
-  );
-  await execute(
-    spawn(
-      2,
-      9,
-      JIM,
-      pank(512)
-    ),
-  );
-  await execute(
-    spawn(
-      1,
-      3,
-      GRIF,
-      pank(666)
-    ),
-  );
-  await execute(
-    spawn(
-      3,
-      3,
-      XEN,
-      ape(5)
-    ),
-  );
+  await execute(spawn(3, 5, ALER, pank(3)));
+  await execute(spawn(17, 8, TREVOR, pank(552)));
+  await execute(spawn(15, 7, ALGO, ape(9541)));
+  await execute(spawn(10, 5, JACK, monster(5555)));
+  await execute(spawn(11, 6, MONKEY, ape(2311)));
+  await execute(spawn(4, 9, ELSA, monkey(133)));
+  await execute(spawn(6, 4, LIGHT, ape(321)));
+  await execute(spawn(8, 9, XAN, satoshi(512)));
+  await execute(spawn(16, 2, UNKNOWN, satoshi(231)));
+  await execute(spawn(5, 1, JOHND, ape(121)));
+  await execute(spawn(11, 2, DOC, ape(111)));
+  await execute(spawn(14, 5, ART, monster(566)));
+  await execute(spawn(0, 1, HERO, ape(1)));
+  await execute(spawn(18, 1, NICKY, pank(412)));
+  await execute(spawn(2, 9, JIM, pank(512)));
+  await execute(spawn(1, 3, GRIF, pank(666)));
+  await execute(spawn(3, 3, XEN, ape(5)));
 
   await execute(fire(ELSA, JIM, 1));
   await execute(fire(JIM, ELSA, 1));

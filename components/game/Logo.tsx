@@ -1,25 +1,25 @@
+import { useEffect, useState } from 'react';
+
 import { useSpring } from '@react-spring/core';
 import { Text3D } from '@react-three/drei';
 import { GroupProps, useFrame } from '@react-three/fiber';
-import { useEffect, useState } from 'react';
-import { Vector3Tuple } from 'three';
 
 export const Logotype: React.FC<{} & GroupProps> = (props) => {
-  const [targetHeight, setTargetHeight] = useState(0.1); 
-  const [height, setHeight] = useState(0.1); 
+  const [targetHeight, setTargetHeight] = useState(0.1);
+  const [height, setHeight] = useState(0.1);
   const spring = useSpring({
     from: { height: 0 },
-    height: targetHeight
+    height: targetHeight,
   });
 
   useEffect(() => {
     const interval = setInterval(() => {
-        setTargetHeight(0.1 + Math.random() * 0.5)
-    }, 100)
+      setTargetHeight(0.1 + Math.random() * 0.5);
+    }, 100);
     return () => {
-        clearInterval(interval)
-    }
-  })
+      clearInterval(interval);
+    };
+  });
 
   useFrame(() => {
     setHeight(spring.height.get());
