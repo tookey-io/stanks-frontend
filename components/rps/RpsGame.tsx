@@ -1,20 +1,23 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
+import io, { Socket } from 'socket.io-client';
 
-import { HiroUserDto } from '../../dto/auth/hiro.dto';
-import { useStores } from '../../stores';
 import Loader from '../shared/Loader';
 import RpsActions from './RpsActions';
 import RpsPlayer from './RpsPlayer';
-import RpsRoomInput from './RpsRoomInput';
+import RpsRoom from './RpsRoom';
 import RpsStatus from './RpsStatus';
 import RpsSubmitButton from './RpsSubmitButton';
 
+export interface RpsRoomDto {
+  [address: string]: boolean;
+}
+
 interface RpsStateResponseDto {
-  status: 'created' | 'finished';
+  status: 'started' | 'finished';
   winners?: string[];
   moves?: {
-    [playerId: string]: string;
+    [address: string]: Moves;
   };
 }
 
@@ -24,137 +27,102 @@ export enum Moves {
   Paper = 4, // 100
 }
 
-const API_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/rps`;
+let socket: Socket;
 
 const RpsGame = observer(() => {
-  const { hiroStore } = useStores();
+  const [room, upateRoom] = useState<RpsRoomDto | null>(null);
 
-  const [hiroUser, setHiroUser] = useState<HiroUserDto | null>(null);
+  const [virtualAddress, setVirtualAddress] = useState<string | null>(null);
   const [roomId, setRoomId] = useState<null | string>(null);
   const [move, setMove] = useState<null | Moves>(null);
-  const [canSubmit, setCanSubmit] = useState(false);
-  const [isSubmitted, submit] = useState(false);
-  const [isWaitingForPartner, setWaitingForPartner] = useState(false);
-  const [response, setResponse] = useState<null | RpsStateResponseDto>(null);
-
-  const getRandom = () => `${parseInt(`${Math.random() * 9999}`)}`;
+  const [status, setStatus] = useState<null | RpsStateResponseDto>(null);
 
   useEffect(() => {
-    setHiroUser(hiroStore.getUser());
-    setRoomId(getRandom);
+    socket = io(`${process.env.NEXT_PUBLIC_BACKEND_URL}`);
+
+    socket.on('connect', () => {
+      console.log('connect');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('disconnect');
+      if (roomId && virtualAddress) {
+        socket.emit('room-leave', { roomId, address: virtualAddress });
+      }
+    });
+
+    socket.on('room', (data) => {
+      console.log('room', data);
+      upateRoom(data);
+    });
+
+    socket.on('status', (data) => {
+      console.log('status', data);
+      setStatus(data);
+    });
+
+    return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('room');
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!canSubmit && hiroUser && roomId && move) setCanSubmit(true);
-    else setCanSubmit(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hiroUser, roomId, move]);
-
-  useEffect(() => {
-    const postMove = async () => {
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            roomId,
-            playerId: hiroUser?.profile.stxAddress.mainnet,
-            hash: `${move}`,
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        if (res.ok) setWaitingForPartner(true);
-      } catch (error) {
-        console.log('error', error);
-      }
-    };
-
-    if (isSubmitted && !isWaitingForPartner) postMove();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSubmitted]);
-
-  useEffect(() => {
-    if (!isWaitingForPartner) return;
-    const getResult = async () => {
-      try {
-        const params = new URLSearchParams();
-        params.set('roomId', roomId!);
-        params.set('playerId', hiroUser?.profile.stxAddress.mainnet!);
-        const res = await fetch(`${API_URL}?${params.toString()}`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        const data: RpsStateResponseDto = await res.json();
-        if (data && data.status) {
-          if (data.status === 'finished') {
-            setResponse(data);
-            clearInterval(interval);
-          }
-        }
-      } catch (error) {
-        console.log('error', error);
-      }
-    };
-
-    const interval = setInterval(() => {
-      if (!response) {
-        getResult();
-      }
-    }, 2000);
-
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isWaitingForPartner]);
-
-  const onRoomUpdate = (event: any) => {
-    setRoomId(event.target.value);
+  const onPlayerAuth = (value: string) => {
+    setVirtualAddress(value);
   };
 
-  const onActionSelect = (moveId: number) => (event: any) => {
-    if (moveId === move) setMove(null);
-    else setMove(moveId);
+  const onRoomSelect = (value: string | null) => {
+    if (!value) socket.emit('room-leave', { roomId, address: virtualAddress });
+    else socket.emit('room-join', { roomId: value, address: virtualAddress });
+    setRoomId(value);
   };
 
-  const onSubmit = () => {
-    if (!isSubmitted) submit(true);
+  const onActionSelect = (value: Moves) => {
+    if (value) {
+      socket.emit('move', {
+        roomId,
+        address: virtualAddress,
+        move: value,
+      });
+      setMove(value);
+    }
   };
 
   const onRefresh = () => {
-    setRoomId(getRandom);
+    setRoomId(null);
     setMove(null);
-    setCanSubmit(true);
-    submit(false);
-    setWaitingForPartner(false);
-    setResponse(null);
+    setStatus(null);
+    upateRoom(null);
   };
 
   return (
     <div className="m-auto w-fit flex flex-col items-center">
       <div className="pt-10">
-        <RpsPlayer />
+        <RpsPlayer onAuth={onPlayerAuth} />
       </div>
       <div className="pt-10 w-full">
-        <RpsRoomInput onChange={onRoomUpdate} value={roomId} />
+        <RpsRoom onSelect={onRoomSelect} room={room} />
       </div>
-      <div className="pt-10">
-        <RpsActions onSelect={onActionSelect} selected={move} />
-      </div>
-      <div className="pt-10">
-        {!isWaitingForPartner ? (
-          <RpsSubmitButton onSubmit={onSubmit} isActive={canSubmit} />
-        ) : response ? (
-          <RpsStatus
-            winners={response.winners}
-            playerAddress={hiroUser?.profile.stxAddress.mainnet}
-            onRefresh={onRefresh}
-          />
-        ) : (
-          <Loader />
-        )}
-      </div>
+      {room && Object.keys(room).length > 1 ? (
+        <>
+          <div className="pt-10">
+            <RpsActions onSelect={onActionSelect} />
+          </div>
+          <div className="pt-10">
+            {status && status.status === 'finished' ? (
+              <RpsStatus
+                winners={status.winners}
+                playerAddress={virtualAddress!}
+                onRefresh={onRefresh}
+              />
+            ) : move || (status && status.status === 'started') ? (
+              <Loader />
+            ) : null}
+          </div>
+        </>
+      ) : null}
     </div>
   );
 });

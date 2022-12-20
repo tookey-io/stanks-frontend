@@ -10,7 +10,11 @@ import { HiroUserDto } from '../../dto/auth/hiro.dto';
 import WalletService from '../../services/wallet.service';
 import { useStores } from '../../stores';
 
-const RpsPlayer = observer(() => {
+interface RpsPlayerProps {
+  onAuth: (address: string) => void;
+}
+
+const RpsPlayer = observer(({ onAuth }: RpsPlayerProps) => {
   const { hiroStore } = useStores();
 
   const [hiroUser, updateHiroUser] = useState<HiroUserDto | null>(null);
@@ -54,7 +58,6 @@ const RpsPlayer = observer(() => {
             },
             onFinish(data) {
               hiroStore.saveRpsSignature(data);
-
               setVirtualAddress(mainnetAddress);
             },
           });
@@ -66,6 +69,11 @@ const RpsPlayer = observer(() => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hiroUser]);
+
+  useEffect(() => {
+    if (virtualAddress) onAuth(virtualAddress);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [virtualAddress]);
 
   const onHiroWalletAuth = async () => {
     const user = await hiroStore.connect();
