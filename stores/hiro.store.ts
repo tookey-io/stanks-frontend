@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 import { AppConfig, SignatureData, UserSession, showConnect } from '@stacks/connect';
+import { Wallet } from '@stacks/wallet-sdk';
 
 import { HiroUserDto } from '../dto/auth/hiro.dto';
 
@@ -39,10 +40,26 @@ export default class HiroStore {
     });
   }
 
-  saveSignature(signature: SignatureData) {
+  saveStanksSignature(signature: SignatureData) {
     const user = this.getUser();
     if (user) {
-      user.signatureData = signature;
+      user.stanksSignature = signature;
+      this.setUser(user);
+    }
+  }
+
+  saveRpsSignature(signature: SignatureData) {
+    const user = this.getUser();
+    if (user) {
+      user.rpsSignature = signature;
+      this.setUser(user);
+    }
+  }
+
+  saveRpsWallet(wallet: Wallet) {
+    const user = this.getUser();
+    if (user) {
+      user.rpsWallet = wallet;
       this.setUser(user);
     }
   }

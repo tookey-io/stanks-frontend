@@ -75,7 +75,7 @@ const AuthPage = observer(() => {
       },
       onFinish(data) {
         const signature = Buffer.from(data.signature, 'hex').toString('base64');
-        hiroStore.saveSignature(data);
+        hiroStore.saveStanksSignature(data);
         updateSignature(signature);
       },
     });
