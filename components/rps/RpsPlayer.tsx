@@ -49,6 +49,7 @@ const RpsPlayer = observer(({ onAuth }: RpsPlayerProps) => {
           });
 
           const message = `I want to use ${mainnetAddress} for play a game`;
+
           openSignatureRequestPopup({
             message,
             network: new StacksMainnet(),

@@ -4,10 +4,11 @@ import { Moves } from './RpsGame';
 
 interface RpsActionsProps {
   onSelect: (move: Moves) => void;
+  visible?: boolean;
 }
 
-const RpsActions = ({ onSelect }: RpsActionsProps) => {
-  const [selected, setSelected] = useState<Moves | undefined>();
+const RpsActions = ({ onSelect, visible }: RpsActionsProps) => {
+  const [selected, setSelected] = useState<Moves>();
 
   useEffect(() => {
     if (selected) onSelect(selected);
@@ -18,9 +19,15 @@ const RpsActions = ({ onSelect }: RpsActionsProps) => {
     setSelected(move);
   };
 
+  if (!visible) {
+    if (selected) setSelected(undefined);
+    return null;
+  }
+
   return (
-    <div className="inline-flex rounded-md shadow-sm" role="group">
+    <div className="py-10 inline-flex rounded-md shadow-sm" role="group">
       <button
+        disabled={!!selected}
         type="button"
         className={`inline-flex items-center py-3.5 px-4 text-sm font-medium rounded-l-lg border focus:z-10 focus:ring-2 text-white ${
           Moves.Rock !== selected
@@ -46,6 +53,7 @@ const RpsActions = ({ onSelect }: RpsActionsProps) => {
         Rock
       </button>
       <button
+        disabled={!!selected}
         type="button"
         className={`inline-flex items-center py-3.5 px-4 text-sm font-medium border-t border-b focus:z-10 focus:ring-2 text-white ${
           Moves.Paper !== selected
@@ -71,6 +79,7 @@ const RpsActions = ({ onSelect }: RpsActionsProps) => {
         Paper
       </button>
       <button
+        disabled={!!selected}
         type="button"
         className={`inline-flex items-center py-3.5 px-4 text-sm font-medium rounded-r-md border focus:z-10 focus:ring-2 text-white ${
           Moves.Scissors !== selected

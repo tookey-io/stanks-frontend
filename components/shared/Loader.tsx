@@ -1,6 +1,10 @@
-import React from 'react';
+interface LoaderProps {
+  visible?: boolean;
+}
 
-export default function Loader() {
+export default function Loader({ visible }: LoaderProps) {
+  if (!visible) return null;
+
   return (
     <div role="status">
       <svg

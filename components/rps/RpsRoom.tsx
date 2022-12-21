@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 
-import { RpsRoomDto } from './RpsGame';
+import { RpsPlayerDataDto, RpsRoomDataDto } from './RpsGame';
 
 interface RpsRoomProps {
-  onSelect: (value: string | null) => void;
-  room: RpsRoomDto | null;
+  onSelect: (value?: string) => void;
+  players?: RpsRoomDataDto;
+  winners?: string[];
 }
-const RpsRoom = ({ onSelect, room }: RpsRoomProps) => {
+const RpsRoom = ({ onSelect, players, winners }: RpsRoomProps) => {
   const [roomId, setRoomId] = useState<string>('');
   const [isJoined, join] = useState(false);
 
@@ -15,6 +16,11 @@ const RpsRoom = ({ onSelect, room }: RpsRoomProps) => {
   useEffect(() => {
     setRoomId(getRandom());
   }, []);
+
+  useEffect(() => {
+    if (isJoined && !players) join(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [players]);
 
   const onChange = (event: any) => {
     setRoomId(event.target.value);
@@ -25,9 +31,18 @@ const RpsRoom = ({ onSelect, room }: RpsRoomProps) => {
       onSelect(roomId);
       join(true);
     } else {
-      onSelect(null);
+      onSelect(undefined);
       join(false);
     }
+  };
+
+  const getStatus = (player: RpsPlayerDataDto, winners?: string[]): string => {
+    if (!winners) return player.commitment ? 'Commited' : 'Joined';
+    return !winners.length
+      ? 'Draw'
+      : winners.includes(player.playerId)
+      ? 'Won'
+      : 'Loose';
   };
 
   return (
@@ -81,12 +96,12 @@ const RpsRoom = ({ onSelect, room }: RpsRoomProps) => {
           </button>
         )}
       </div>
-      {room && Object.keys(room).length ? (
+      {players && Object.keys(players).length ? (
         <div className="mt-10">
           <h6 className="text-lg font-bold dark:text-white">Players</h6>
           <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-            {Object.keys(room).map((key) => (
-              <li key={key} className="py-3 sm:py-4">
+            {Object.values(players).map((player) => (
+              <li key={player.playerId} className="py-3 sm:py-4">
                 <div className="flex items-center space-x-4">
                   <div className="flex-shrink-0">
                     <svg
@@ -106,10 +121,10 @@ const RpsRoom = ({ onSelect, room }: RpsRoomProps) => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                      {key}
+                      {player.playerId}
                     </p>
                     <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                      Connected
+                      {getStatus(player, winners)}
                     </p>
                   </div>
                 </div>

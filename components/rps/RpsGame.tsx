@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
@@ -5,20 +6,34 @@ import io, { Socket } from 'socket.io-client';
 import Loader from '../shared/Loader';
 import RpsActions from './RpsActions';
 import RpsPlayer from './RpsPlayer';
+import RpsResult from './RpsResult';
 import RpsRoom from './RpsRoom';
-import RpsStatus from './RpsStatus';
-import RpsSubmitButton from './RpsSubmitButton';
 
-export interface RpsRoomDto {
-  [address: string]: boolean;
+export enum RpsStatus {
+  Wait = 'wait',
+  Start = 'start',
+  Commit = 'commit',
+  Reveal = 'reveal',
+  Finished = 'finished',
+  Fail = 'fail',
 }
 
-interface RpsStateResponseDto {
-  status: 'started' | 'finished';
+export interface RpsPlayerDataDto {
+  playerId: string;
+  commitment?: string;
+  choice?: string;
+  nonce?: string;
+}
+
+export interface RpsRoomDataDto {
+  [player: string]: RpsPlayerDataDto;
+}
+
+export interface RpsGameState {
+  status?: RpsStatus;
+  roomId?: string;
+  players?: RpsRoomDataDto;
   winners?: string[];
-  moves?: {
-    [address: string]: Moves;
-  };
 }
 
 export enum Moves {
@@ -30,12 +45,14 @@ export enum Moves {
 let socket: Socket;
 
 const RpsGame = observer(() => {
-  const [room, upateRoom] = useState<RpsRoomDto | null>(null);
+  const [playerId, setPlayerId] = useState<string>();
 
-  const [virtualAddress, setVirtualAddress] = useState<string | null>(null);
-  const [roomId, setRoomId] = useState<null | string>(null);
-  const [move, setMove] = useState<null | Moves>(null);
-  const [status, setStatus] = useState<null | RpsStateResponseDto>(null);
+  const [game, upateGame] = useState<RpsGameState>();
+  const [roomId, setRoomId] = useState<string>();
+  const [choice, setChoice] = useState<Moves>();
+  const [nonce, setNonce] = useState<string>();
+  const [status, setStatus] = useState<RpsStatus>();
+  const [winners, setWinners] = useState<string[]>();
 
   useEffect(() => {
     socket = io(`${process.env.NEXT_PUBLIC_BACKEND_URL}`);
@@ -46,55 +63,75 @@ const RpsGame = observer(() => {
 
     socket.on('disconnect', () => {
       console.log('disconnect');
-      if (roomId && virtualAddress) {
-        socket.emit('room-leave', { roomId, address: virtualAddress });
+      if (roomId && playerId) {
+        socket.emit('room-leave', { roomId, playerId });
       }
     });
 
-    socket.on('room', (data) => {
-      console.log('room', data);
-      upateRoom(data);
-    });
-
-    socket.on('status', (data) => {
-      console.log('status', data);
-      setStatus(data);
+    socket.on('rps-state', (data: RpsGameState) => {
+      console.log('rps-state', data);
+      if (!data.status) return reset();
+      upateGame(data);
+      setStatus(data.status);
     });
 
     return () => {
       socket.off('connect');
       socket.off('disconnect');
-      socket.off('room');
+      socket.off('rps-state');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onPlayerAuth = (value: string) => {
-    setVirtualAddress(value);
+  useEffect(() => {
+    if (status === RpsStatus.Reveal) {
+      socket.emit('reveal', {
+        roomId,
+        playerId,
+        choice,
+        nonce,
+      });
+    }
+    if (status === RpsStatus.Finished) {
+      setWinners(game?.winners);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+
+  const onPlayerAuth = (value: string): void => {
+    setPlayerId(value);
   };
 
-  const onRoomSelect = (value: string | null) => {
-    if (!value) socket.emit('room-leave', { roomId, address: virtualAddress });
-    else socket.emit('room-join', { roomId: value, address: virtualAddress });
+  const onRoomSelect = (value?: string): void => {
+    if (!value) socket.emit('room-leave', { roomId, playerId });
+    else socket.emit('room-join', { roomId: value, playerId });
     setRoomId(value);
   };
 
-  const onActionSelect = (value: Moves) => {
+  const hash = (message: string | number, randomValue: string): string => {
+    const hash = crypto.createHash('sha256');
+    hash.update(randomValue + message);
+    return hash.digest('hex');
+  };
+
+  const onActionSelect = (value: Moves): void => {
     if (value) {
-      socket.emit('move', {
-        roomId,
-        address: virtualAddress,
-        move: value,
-      });
-      setMove(value);
+      const randomValue = crypto.randomBytes(32).toString('hex');
+      const commitment = hash(value, randomValue);
+      socket.emit('commit', { roomId, playerId, commitment });
+      setChoice(value);
+      setNonce(randomValue);
     }
   };
 
-  const onRefresh = () => {
-    setRoomId(null);
-    setMove(null);
-    setStatus(null);
-    upateRoom(null);
+  const reset = () => {
+    upateGame(undefined);
+    setRoomId(undefined);
+    setChoice(undefined);
+    setNonce(undefined);
+    setStatus(undefined);
+    setWinners(undefined);
+    socket.emit('room-leave', { roomId, playerId });
   };
 
   return (
@@ -103,26 +140,29 @@ const RpsGame = observer(() => {
         <RpsPlayer onAuth={onPlayerAuth} />
       </div>
       <div className="pt-10 w-full">
-        <RpsRoom onSelect={onRoomSelect} room={room} />
+        <RpsRoom
+          onSelect={onRoomSelect}
+          players={game?.players}
+          winners={winners}
+        />
       </div>
-      {room && Object.keys(room).length > 1 ? (
-        <>
-          <div className="pt-10">
-            <RpsActions onSelect={onActionSelect} />
-          </div>
-          <div className="pt-10">
-            {status && status.status === 'finished' ? (
-              <RpsStatus
-                winners={status.winners}
-                playerAddress={virtualAddress!}
-                onRefresh={onRefresh}
-              />
-            ) : move || (status && status.status === 'started') ? (
-              <Loader />
-            ) : null}
-          </div>
-        </>
-      ) : null}
+      <RpsActions
+        onSelect={onActionSelect}
+        visible={game && game.status !== RpsStatus.Wait}
+      />
+      <RpsResult
+        winners={winners}
+        playerAddress={playerId!}
+        onRefresh={reset}
+        visible={game && game.status === RpsStatus.Finished}
+      />
+      <Loader
+        visible={
+          game?.status &&
+          (game?.status === RpsStatus.Commit ||
+            game?.status === RpsStatus.Reveal)
+        }
+      />
     </div>
   );
 });
