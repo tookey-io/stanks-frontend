@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "stanks-frontend-{{ include "stanks-frontend.branch" . }}"
+  labels:
+    service: "stanks-frontend-{{ include "stanks-frontend.branch" . }}"
+spec:
+  replicas: 2
+  minReadySeconds: 15
+  selector:
+    matchLabels:
+      service: "stanks-frontend-{{ include "stanks-frontend.branch" . }}"
+  template:
+    metadata:
+      labels:
+        service: "stanks-frontend-{{ include "stanks-frontend.branch" . }}"
+    spec:
+      containers:
+        - name: service
+          image: {{ .Values.image }}
+          livenessProbe:
+            exec:
+              command: [ "/bin/sh", "/app/bin/liveness.sh" ]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command: [ "/bin/sh", "/app/bin/readiness.sh" ]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          ports:
+            - name: 'http'
+              containerPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "stanks-frontend-{{ include "stanks-frontend.branch" . }}"
+spec:
+  type: ClusterIP
+  selector:
+    service: "stanks-frontend-{{ include "stanks-frontend.branch" . }}"
+  ports:
+    - port: 80
+      targetPort: 3000
+      name: "http"
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: "stanks-frontend-{{ include "stanks-frontend.branch" . }}"
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: "Host(`{{ .Values.botType }}-{{ include "stanks-frontend.domain-tr" . }}.{{ .Values.domain }}`)"
+      kind: Rule
+      services:
+        - name: "stanks-frontend-{{ include "stanks-frontend.branch" . }}"
+          port: 80

@@ -1,0 +1,6 @@
+domain: staging.tookey.cloud
+botType: stanks-frontend
+
+# Should be provided from cmd
+branch: staging
+image: ""
